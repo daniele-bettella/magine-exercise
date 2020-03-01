@@ -1,16 +1,28 @@
-# Backend Refactoring Exercise
+## Issues:                                                                                                                                                     
+ - the app does not consider potential name collisions                                                                                                      
+   - make model use an id to avoid collisions with names                                                                                                    
+     - this change is not API compatible with the previous version, I will assume no previous usage of the API                                              
+     - [implemented] I would modify the get /name endpoint to instead accept an id                                                                          
+     - [implemented] I would modify the delete /name endpoint to instead accept an id                                                                       
+     - I would add an optional name query parameter to the root get endpoint to filter entries by name                                                      
+ - the app does not control the number of returned elements in the get request                                                                              
+   - I would add some form of pagination to limit the size of responses                                                                                     
+ - the delete endpoint logic is needlessly complicated                                                                                                      
+   - [implemented] I would replace it with a simple call to filterNot                                                                                       
+ - the app does not return meaningful error codes                                                                                                           
+   - [implemented] I would return 400 errors for malformed inputs                                                                                           
+   - [implemented] I would return a 404 error in the get by id                                                                                              
+ - the app changes the port at each run                                                                                                                     
+   - this does not make much sense, especially in a production environment (unless the server sits behind a reverse proxy with some auto-discovery feature) 
+ - the app mixes restful and non-restful endpoints (the /add endpoint points to a verb, not to a resource)                                                  
+   - I would change it to a POST on / (and maybe move all endpoints to a named resource like /phoneentry)                                                   
 
-This project contains a service for storing and retrieving phone numbers for users.
-
-The code for the service has deliberately been written poorly.
-
-The purpose of this exercise is to:
-
-- understand the code,
-- spot any potential bugs or issues,
-- suggest refactorings to make the code more readable and maintainable,
-- mention what's missing, assuming the service is to be run in production.
-
-In preparation for the interview, we would like you to write down a list of issues, refactorings, etc. to be discussed during the interview.
-
-Optionally, if you'd like to, you can also implement some of the suggestions and bring along the refactored solution. The service uses the [finagle](https://twitter.github.io/finagle/) and [json4s](http://json4s.org/) libraries, but feel free to replace them with other libraries, and use other libraries as you see fit.
+## Improvements:                                                                                                                                               
+ - use case classes for model entities                                                                                                                      
+   - [implemented] json4s has support for case classes, I would move the model to a case class for cleaner code                                             
+ - persist in a non volatile storage and add a model layer                                                                                                  
+   - this application will lose all data if the server is shut down, I would add some form of persistence storage                                           
+ - add a validation filter                                                                                                                                  
+   - the app performs no validation of its inputs. Considering it is a phone book I would at least check the phone numbers have some format                 
+ - add tests                                                                                                                                                
+   - this app has no tests, I would create some integration tests leveraging finagle http clients                                                           
